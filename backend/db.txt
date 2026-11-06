@@ -1,0 +1,6 @@
+usrname 'wing_user'
+localhost 'localhost'
+personal password 'wingbankdemo@2026';
+
+
+don't delete ok , because i'm not remember it !
