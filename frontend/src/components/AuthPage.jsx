@@ -1,5 +1,6 @@
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import wingBankLogo from "../assets/wb-logo.svg";
+import loginBackground from "../assets/bgformlogin.png";
 
 export default function AuthPage({isLogin, switchMode, form, handleChange, handleSubmit, showPassword, setShowPassword, loading, message, success}) {
   return (
@@ -7,33 +8,21 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
         <div className="w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-blue-900/10 border border-blue-100">
           <div className="grid md:grid-cols-2">
             {/* Left: branding */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-sky-100 to-blue-200 p-8 md:p-10">
+            <section
+              className="relative overflow-hidden bg-cover bg-center p-8 md:p-10"
+              style={{
+                backgroundImage: `url(${loginBackground})`,
+                backgroundPosition: "35% center",
+              }}
+            >
               <div className="relative z-10">
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-                  <span className="text-green-600">Wing</span>{" "}
-                  <span className="text-blue-700">Bank</span>
-                </h1>
-                <p className="mt-5 max-w-xs text-lg leading-8 text-slate-600">
-                  Your Trusted Partner for a Better Tomorrow
-                </p>
+                <img
+                  src={wingBankLogo}
+                  alt="Wing Bank"
+                  className="w-56 sm:w-64 h-auto object-contain object-left"
+                />
               </div>
 
-              <div className="relative z-10 mt-12 flex h-44 items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-t from-blue-500/40 to-white/30">
-                <div className="relative h-36 w-64 rounded-t-xl border border-white/70 bg-white/70 shadow-xl">
-                  <div className="absolute inset-x-0 top-0 h-3 bg-green-500" />
-                  <div className="grid h-full grid-cols-4 gap-2 p-4 pt-7">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="rounded-sm border border-blue-200 bg-sky-200/80"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-green-400/40 blur-2xl" />
-              <div className="absolute -right-20 bottom-10 h-48 w-48 rounded-full bg-blue-400/30 blur-2xl" />
             </section>
 
             {/* Right: login / register */}
@@ -47,7 +36,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
               </div>
 
               <h2 className="text-center text-3xl font-bold tracking-tight text-slate-900">
-                {isLogin ? "Login Form" : "Create Account"}
+                {isLogin ? "Login Account" : "Create Account"}
               </h2>
               <p className="mt-2 text-center text-sm leading-6 text-slate-500">
                 {isLogin

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import wing from "../assets/wing.png";
 import search from "../assets/search.png";
 import flag from "../assets/flag.png";
@@ -10,10 +11,12 @@ export default function DashboardHeader({
   profile,
 }) {
   return (
-      <header className="bg-white border-b border-gray-100">
+      <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
         <div className="max-w-[1280px] mx-auto h-20 px-4 sm:px-6 flex items-center justify-between">
           <div className="flex items-center gap-6 sm:gap-12">
-            <img src={wing} alt="Wing Bank" className="w-[100px] sm:w-[130px] h-auto" />
+            <Link to="/dashboard" aria-label="Go to dashboard home" className="shrink-0">
+              <img src={wing} alt="Wing Bank" className="w-[100px] sm:w-[190px] h-auto" />
+            </Link>
 
             <nav className="hidden lg:flex items-center gap-10">
               <a href="#personal" className="text-lg text-gray-500 hover:text-gray-900">Personal</a>
