@@ -9,6 +9,7 @@ const translations = {
       "Select language": "Select language",
       "Switch to Khmer": "Switch to Khmer",
       "Switch to English": "Switch to English",
+      "Demo data is saved in this browser only.": "Demo data is saved in this browser only.",
       "Login Account": "Login Account",
       "Create Account": "Create Account",
       "Welcome back! Please login to your account.":
@@ -235,6 +236,7 @@ const translations = {
       "Select language": "ជ្រើសរើសភាសា",
       "Switch to Khmer": "ប្តូរទៅភាសាខ្មែរ",
       "Switch to English": "ប្តូរទៅភាសាអង់គ្លេស",
+      "Demo data is saved in this browser only.": "ទិន្នន័យសាកល្បងត្រូវបានរក្សាទុកតែក្នុងកម្មវិធីរុករកនេះប៉ុណ្ណោះ។",
       "Login Account": "ចូលគណនី",
       "Create Account": "បង្កើតគណនី",
       "Welcome back! Please login to your account.":

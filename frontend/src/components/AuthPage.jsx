@@ -4,7 +4,7 @@ import wingBankLogo from "../assets/wb-logo.svg";
 import loginBackground from "../assets/bgformlogin.png";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 
-export default function AuthPage({isLogin, switchMode, form, handleChange, handleSubmit, showPassword, setShowPassword, loading, message, success}) {
+export default function AuthPage({isLogin, switchMode, form, handleChange, handleSubmit, showPassword, setShowPassword, loading, message, success, demoMode}) {
   const { t } = useTranslation();
 
   return (
@@ -179,6 +179,12 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                   {isLogin ? t("Register here") : t("Login here")}
                 </button>
               </p>
+
+              {demoMode && (
+                <p className="mt-5 text-center text-xs text-slate-400">
+                  {t("Demo data is saved in this browser only.")}
+                </p>
+              )}
 
             </section>
           </div>

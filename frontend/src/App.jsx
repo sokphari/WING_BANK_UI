@@ -34,6 +34,9 @@ const API_URL = `${BASE_URL}/auth`;
 const PROFILE_URL = `${API_URL}/profile`;
 const EXCHANGE_URL = `${BASE_URL}/exchange-rate`;
 const ACCOUNTS_URL = `${BASE_URL}/accounts`;
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
+const DEMO_USERS_KEY = "wing_bank_demo_users";
+const DEMO_SESSION_KEY = "wing_bank_demo_user_id";
 
 const slides = [
   {
@@ -80,13 +83,83 @@ function getStoredProfile() {
   }
 }
 
+function getDemoUsers() {
+  try {
+    const users = JSON.parse(localStorage.getItem(DEMO_USERS_KEY) || "[]");
+    return Array.isArray(users) ? users : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDemoUsers(users) {
+  localStorage.setItem(DEMO_USERS_KEY, JSON.stringify(users));
+}
+
+function getCurrentDemoUser() {
+  const userId = localStorage.getItem(DEMO_SESSION_KEY);
+  return getDemoUsers().find((user) => user.id === userId) || null;
+}
+
+function toDemoProfile(user) {
+  if (!user) return null;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar || null,
+  };
+}
+
+function makeDemoAccount(accountType, balance = 0) {
+  return {
+    id: `demo-account-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    account_type: accountType,
+    account_number: Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)).join(""),
+    balance,
+    currency: "USD",
+  };
+}
+
+async function hashDemoPassword(password, salt = crypto.getRandomValues(new Uint8Array(16))) {
+  const passwordKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+  const hash = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: 120000, hash: "SHA-256" },
+    passwordKey,
+    256,
+  );
+  const toBase64 = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes)));
+  return `${toBase64(salt)}.${toBase64(hash)}`;
+}
+
+async function verifyDemoPassword(password, storedHash) {
+  try {
+    const [saltBase64, expectedHash] = storedHash.split(".");
+    const salt = Uint8Array.from(atob(saltBase64), (character) => character.charCodeAt(0));
+    const actualHash = await hashDemoPassword(password, salt);
+    return actualHash.split(".")[1] === expectedHash;
+  } catch {
+    return false;
+  }
+}
+
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
 
   // ---------- Auth ----------
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(() =>
+    DEMO_MODE
+      ? !!localStorage.getItem(DEMO_SESSION_KEY)
+      : !!localStorage.getItem("token"),
+  );
   const isLogin = location.pathname !== "/register";
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -94,8 +167,9 @@ function App() {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [profile, setProfile] = useState(getStoredProfile);
-  const [profileLoading, setProfileLoading] = useState(
-    () => !!localStorage.getItem("token") && !getStoredProfile(),
+  const [profileLoading, setProfileLoading] = useState(() =>
+    (DEMO_MODE ? !!localStorage.getItem(DEMO_SESSION_KEY) : !!localStorage.getItem("token")) &&
+    !getStoredProfile(),
   );
   const [profileError, setProfileError] = useState("");
 
@@ -128,6 +202,7 @@ function App() {
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("profile");
+    localStorage.removeItem(DEMO_SESSION_KEY);
     setIsLoggedIn(false);
     setProfile(null);
     setAccounts([]);
@@ -145,6 +220,53 @@ function App() {
     setLoading(true);
 
     try {
+      if (DEMO_MODE) {
+        const users = getDemoUsers();
+        const email = form.email.trim().toLowerCase();
+
+        if (!isLogin) {
+          if (users.some((user) => user.email === email)) {
+            setMessage("This email is already registered.");
+            setSuccess(false);
+            return;
+          }
+
+          const newUser = {
+            id: `demo-user-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            name: form.name.trim(),
+            email,
+            passwordHash: await hashDemoPassword(form.password),
+            avatar: null,
+            accounts: [makeDemoAccount("Savings")],
+          };
+          saveDemoUsers([...users, newUser]);
+          setMessage("Registration successful! Please login.");
+          setSuccess(true);
+          setForm((current) => ({ ...current, name: "", password: "" }));
+          navigate("/login");
+          return;
+        }
+
+        const user = users.find((entry) => entry.email === email);
+        if (!user || !(await verifyDemoPassword(form.password, user.passwordHash))) {
+          setMessage("Invalid email or password.");
+          setSuccess(false);
+          return;
+        }
+
+        const userProfile = toDemoProfile(user);
+        setMessage("Login successful!");
+        setSuccess(true);
+        localStorage.setItem("token", "local-demo-session");
+        localStorage.setItem(DEMO_SESSION_KEY, user.id);
+        localStorage.setItem("profile", JSON.stringify(userProfile));
+        setProfile(userProfile);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setIsLoggedIn(true);
+        navigate("/dashboard");
+        return;
+      }
+
       const response = await fetch(`${API_URL}/${isLogin ? "login" : "register"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,6 +307,12 @@ function App() {
 
   // ---------- Accounts API ----------
   const fetchAccounts = useCallback(async () => {
+    if (DEMO_MODE) {
+      setAccounts(getCurrentDemoUser()?.accounts || []);
+      setAccountMsg("");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       setAccounts([]);
@@ -214,6 +342,29 @@ function App() {
   }, [handleLogout]);
 
   const openAccount = async () => {
+    if (DEMO_MODE) {
+      setAccountMsgOk(true);
+      setAccountMsg("Opening account...");
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const currentUserId = localStorage.getItem(DEMO_SESSION_KEY);
+      const users = getDemoUsers();
+      const userIndex = users.findIndex((user) => user.id === currentUserId);
+      if (userIndex < 0) {
+        setAccountMsgOk(false);
+        setAccountMsg("Please log in first.");
+        return;
+      }
+      const account = makeDemoAccount(accountType);
+      users[userIndex] = {
+        ...users[userIndex],
+        accounts: [...(users[userIndex].accounts || []), account],
+      };
+      saveDemoUsers(users);
+      setAccounts(users[userIndex].accounts);
+      setAccountMsg("Account opened successfully!");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       setAccountMsgOk(false);
@@ -255,6 +406,21 @@ function App() {
   };
 
   const fetchProfile = useCallback(async () => {
+    if (DEMO_MODE) {
+      const user = getCurrentDemoUser();
+      if (!user) {
+        setProfileError("Could not load your current name and email.");
+        setProfileLoading(false);
+        return;
+      }
+      const userProfile = toDemoProfile(user);
+      setProfile(userProfile);
+      localStorage.setItem("profile", JSON.stringify(userProfile));
+      setProfileError("");
+      setProfileLoading(false);
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       setProfileLoading(false);
@@ -284,6 +450,23 @@ function App() {
   }, [handleLogout]);
 
   const saveProfile = async (details) => {
+    if (DEMO_MODE) {
+      const currentUserId = localStorage.getItem(DEMO_SESSION_KEY);
+      const users = getDemoUsers();
+      const email = details.email.trim().toLowerCase();
+      if (users.some((user) => user.id !== currentUserId && user.email === email)) {
+        throw new Error("That email is already in use.");
+      }
+      const userIndex = users.findIndex((user) => user.id === currentUserId);
+      if (userIndex < 0) throw new Error("Profile not found.");
+      users[userIndex] = { ...users[userIndex], ...details, email };
+      saveDemoUsers(users);
+      const userProfile = toDemoProfile(users[userIndex]);
+      setProfile(userProfile);
+      localStorage.setItem("profile", JSON.stringify(userProfile));
+      return userProfile;
+    }
+
     const token = localStorage.getItem("token");
     const response = await fetch(PROFILE_URL, {
       method: "PATCH",
@@ -305,6 +488,13 @@ function App() {
   };
 
   const deleteProfile = async (password) => {
+    if (DEMO_MODE) {
+      const currentUserId = localStorage.getItem(DEMO_SESSION_KEY);
+      saveDemoUsers(getDemoUsers().filter((user) => user.id !== currentUserId));
+      handleLogout();
+      return;
+    }
+
     const token = localStorage.getItem("token");
     const response = await fetch(PROFILE_URL, {
       method: "DELETE",
@@ -340,6 +530,10 @@ function App() {
   // Exchange rate
   useEffect(() => {
     if (!isLoggedIn) return;
+    if (DEMO_MODE) {
+      setExchangeRate({ buy: 4080, sell: 4120, middle: 4100 });
+      return;
+    }
     fetch(EXCHANGE_URL)
       .then((r) => r.json())
       .then((data) => setExchangeRate(data))
@@ -413,6 +607,7 @@ function App() {
       loading={loading}
       message={message}
       success={success}
+      demoMode={DEMO_MODE}
     />
   );
 
