@@ -180,11 +180,11 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                 </button>
               </p>
 
-              {demoMode && (
+              {/* {demoMode && (
                 <p className="mt-5 text-center text-xs text-slate-400">
                   {t("Demo data is saved in this browser only.")}
                 </p>
-              )}
+              )} */}
 
             </section>
           </div>
