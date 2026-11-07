@@ -1,4 +1,5 @@
-import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiShield, FiZap, FiHeart } from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import wingBankLogo from "../assets/wb-logo.svg";
 
 export default function AuthPage({isLogin, switchMode, form, handleChange, handleSubmit, showPassword, setShowPassword, loading, message, success}) {
   return (
@@ -15,21 +16,6 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                 <p className="mt-5 max-w-xs text-lg leading-8 text-slate-600">
                   Your Trusted Partner for a Better Tomorrow
                 </p>
-
-                <div className="mt-8 space-y-5 text-slate-700">
-                  <div className="flex items-center gap-3">
-                    <FiShield className="text-blue-700" size={23} />
-                    <span>Safe & Secure</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <FiZap className="text-blue-700" size={23} />
-                    <span>Fast & Convenient</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <FiHeart className="text-blue-700" size={23} />
-                    <span>Always with You</span>
-                  </div>
-                </div>
               </div>
 
               <div className="relative z-10 mt-12 flex h-44 items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-t from-blue-500/40 to-white/30">
@@ -52,38 +38,21 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
 
             {/* Right: login / register */}
             <section className="p-6 sm:p-10 md:p-12">
-              <div className="mb-9 grid grid-cols-2 rounded-xl bg-slate-100 p-1">
-                <button
-                  type="button"
-                  onClick={() => switchMode(true)}
-                  className={`rounded-lg py-3 font-semibold transition ${
-                    isLogin
-                      ? "bg-green-600 text-white shadow-md"
-                      : "text-slate-600 hover:text-blue-700"
-                  }`}
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => switchMode(false)}
-                  className={`rounded-lg py-3 font-semibold transition ${
-                    !isLogin
-                      ? "bg-green-600 text-white shadow-md"
-                      : "text-slate-600 hover:text-blue-700"
-                  }`}
-                >
-                  Register
-                </button>
+              <div className="mb-9 flex justify-center">
+                <img
+                  src={wingBankLogo}
+                  alt="Wing Bank"
+                  className="h-12 w-auto object-contain"
+                />
               </div>
 
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+              <h2 className="text-center text-3xl font-bold tracking-tight text-slate-900">
                 {isLogin ? "Login Form" : "Create Account"}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
+              <p className="mt-2 text-center text-sm leading-6 text-slate-500">
                 {isLogin
                   ? "Welcome back! Please login to your account."
-                  : "Join Wing Bank. Enter your details to get started."}
+                  : "Register to start Wing bank."}
               </p>
 
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -104,7 +73,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                       value={form.name}
                       onChange={handleChange}
                       required
-                      className="w-full rounded-xl border border-slate-200 px-4 py-4 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      className="w-full rounded-xl border border-slate-200 px-4 py-4 text-sm outline-none transition focus:border-[#85cc16] focus:ring-4 focus:ring-[#85cc16]/20"
                     />
                   </div>
                 )}
@@ -116,7 +85,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                   >
                     Email Address
                   </label>
-                  <div className="flex items-center rounded-xl border border-slate-200 px-4 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100">
+                  <div className="flex items-center rounded-xl border border-slate-200 px-4 focus-within:border-[#85cc16] focus-within:ring-4 focus-within:ring-[#85cc16]/20">
                     <FiMail className="shrink-0 text-slate-400" size={19} />
                     <input
                       id="email"
@@ -139,7 +108,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                   >
                     Password
                   </label>
-                  <div className="flex items-center rounded-xl border border-slate-200 px-4 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100">
+                  <div className="flex items-center rounded-xl border border-slate-200 px-4 focus-within:border-[#85cc16] focus-within:ring-4 focus-within:ring-[#85cc16]/20">
                     <FiLock className="shrink-0 text-slate-400" size={19} />
                     <input
                       id="password"
@@ -162,15 +131,24 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                       {showPassword ? <FiEyeOff size={19} /> : <FiEye size={19} />}
                     </button>
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">At least 6 characters</p>
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <p className="text-slate-500">At least 6 characters</p>
+                    {isLogin && (
+                      <button
+                        type="button"
+                        className="font-semibold text-blue-700 hover:text-blue-800"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-3 rounded-xl bg-green-600 px-4 py-4 font-bold text-white shadow-lg shadow-green-600/20 transition hover:bg-green-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex w-full items-center justify-center rounded-xl bg-[#85cc16] px-4 py-4 font-bold text-white shadow-lg shadow-[#85cc16]/20 transition hover:bg-[#78b914] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <FiLogIn size={20} />
                   {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
                 </button>
               </form>
@@ -206,9 +184,6 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                 </button>
               </p>
 
-              <p className="mt-8 text-center text-xs text-slate-400">
-                Wing Bank Demo · Secure account access
-              </p>
             </section>
           </div>
         </div>

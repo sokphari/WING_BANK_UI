@@ -166,6 +166,8 @@ function App() {
         localStorage.setItem("token", data.token);
         setProfile(data.user || null);
         localStorage.setItem("profile", JSON.stringify(data.user || null));
+        // Keep the auth page visible briefly so the success status can be read.
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setIsLoggedIn(true);
         navigate("/dashboard");
       } else if (response.ok && !isLogin) {
