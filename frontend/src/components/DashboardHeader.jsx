@@ -1,8 +1,14 @@
 import wing from "../assets/wing.png";
 import search from "../assets/search.png";
 import flag from "../assets/flag.png";
+import ProfileMenu from "./ProfileMenu.jsx";
 
-export default function DashboardHeader({handleLogout, mobileMenuOpen, setMobileMenuOpen}) {
+export default function DashboardHeader({
+  handleLogout,
+  mobileMenuOpen,
+  setMobileMenuOpen,
+  profile,
+}) {
   return (
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-[1280px] mx-auto h-20 px-4 sm:px-6 flex items-center justify-between">
@@ -20,10 +26,12 @@ export default function DashboardHeader({handleLogout, mobileMenuOpen, setMobile
           <div className="flex items-center gap-3 sm:gap-[22px]">
             <img src={search} alt="Search" className="w-5 h-5" />
 
-            <div className="hidden sm:flex items-center gap-2 bg-gray-100 px-[14px] py-2 rounded-full">
-              <img src={flag} alt="Khmer" className="w-[18px] h-[18px]" />
-              <span className="text-[13px] text-gray-600">ភាសាខ្មែរ</span>
+            <div className="hidden sm:flex h-12 items-center gap-3 rounded-full bg-gray-100 px-4">
+              <img src={flag} alt="Khmer" className="h-5 w-5" />
+              <span className="text-base text-gray-600">ភាសាខ្មែរ</span>
             </div>
+
+            <ProfileMenu profile={profile} />
 
             <button
               onClick={handleLogout}
@@ -59,9 +67,9 @@ export default function DashboardHeader({handleLogout, mobileMenuOpen, setMobile
                 {label}
               </a>
             ))}
-            <div className="flex items-center gap-2 bg-gray-100 px-[14px] py-2 rounded-full w-fit">
-              <img src={flag} alt="Khmer" className="w-[18px] h-[18px]" />
-              <span className="text-[13px] text-gray-600">ភាសាខ្មែរ</span>
+            <div className="flex h-12 w-fit items-center gap-3 rounded-full bg-gray-100 px-4">
+              <img src={flag} alt="Khmer" className="h-5 w-5" />
+              <span className="text-base text-gray-600">ភាសាខ្មែរ</span>
             </div>
             <button onClick={handleLogout} className="text-left text-base font-semibold text-red-600">
               Logout

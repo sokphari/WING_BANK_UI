@@ -1,30 +1,8 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
+const requireAuth = require("../middleware/requireAuth");
 
 const router = express.Router();
-
-// Verify JWT
-router.use((req, res, next) => {
-  const authHeader = req.headers.authorization || "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
-
-  if (!token) {
-    return res.status(401).json({ message: "Please login to access your accounts." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id ?? decoded.userId ?? decoded.user_id;
-    if (userId === undefined || userId === null || userId === "") {
-      return res.status(401).json({ message: "Your login token does not contain a user ID." });
-    }
-    req.userId = userId;
-    next();
-  } catch (error) {
-    console.error("JWT verification error:", error.message);
-    return res.status(401).json({ message: "Your session expired. Please login again." });
-  }
-});
+router.use(requireAuth);
 
 const COLS = "id, user_id, account_number, account_type, balance, currency, created_at";
 

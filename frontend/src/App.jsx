@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import AuthPage from "./components/AuthPage.jsx";
 import DashboardHeader from "./components/DashboardHeader.jsx";
 import HeroSlider from "./components/HeroSlider.jsx";
 import AccountsPanel from "./components/AccountsPanel.jsx";
 import LoanCalculator from "./components/LoanCalculator.jsx";
 import SiteFooter from "./components/SiteFooter.jsx";
+import ProfilePage from "./components/ProfilePage.jsx";
 import wing1 from "./assets/wing1.png";
 import card1 from "./assets/card1.png";
 import card2 from "./assets/card2.png";
@@ -26,8 +28,9 @@ import wing3 from "./assets/wing3.png";
 import wing4 from "./assets/wing4.png";
 import { ShoppingCart, Car, Bike } from "lucide-react";
 
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 const API_URL = `${BASE_URL}/auth`;
+const PROFILE_URL = `${API_URL}/profile`;
 const EXCHANGE_URL = `${BASE_URL}/exchange-rate`;
 const ACCOUNTS_URL = `${BASE_URL}/accounts`;
 
@@ -68,15 +71,31 @@ const loanTypes = [
 const termOptions = [12, 24, 36, 48, 60, 72, 84, 96];
 const MAX_CREDIT = 100000;
 
+function getStoredProfile() {
+  try {
+    return JSON.parse(localStorage.getItem("profile") || "null");
+  } catch {
+    return null;
+  }
+}
+
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // ---------- Auth ----------
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [isLogin, setIsLogin] = useState(true);
+  const isLogin = location.pathname !== "/register";
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+  const [profile, setProfile] = useState(getStoredProfile);
+  const [profileLoading, setProfileLoading] = useState(
+    () => !!localStorage.getItem("token") && !getStoredProfile(),
+  );
+  const [profileError, setProfileError] = useState("");
 
   // ---------- Homepage ----------
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -99,21 +118,23 @@ function App() {
   };
 
   const switchMode = (login) => {
-    setIsLogin(login);
     setMessage("");
     setSuccess(false);
+    navigate(login ? "/login" : "/register");
   };
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
+    localStorage.removeItem("profile");
     setIsLoggedIn(false);
+    setProfile(null);
     setAccounts([]);
     setAccountMsg("");
     setForm({ name: "", email: "", password: "" });
     setMessage("");
     setSuccess(false);
-    setIsLogin(true);
-  }, []);
+    navigate("/login");
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -143,10 +164,12 @@ function App() {
           return;
         }
         localStorage.setItem("token", data.token);
-        setIsLoggedIn(true); // open the full website
+        setProfile(data.user || null);
+        localStorage.setItem("profile", JSON.stringify(data.user || null));
+        setIsLoggedIn(true);
+        navigate("/dashboard");
       } else if (response.ok && !isLogin) {
-        // After registering, send the user to the login form
-        setIsLogin(true);
+        navigate("/login");
         setForm((f) => ({ ...f, name: "", password: "" }));
       }
     } catch {
@@ -227,6 +250,75 @@ function App() {
     }
   };
 
+  const fetchProfile = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setProfileLoading(false);
+      return;
+    }
+
+    setProfileError("");
+    setProfileLoading(true);
+    try {
+      const response = await fetch(PROFILE_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
+      if (!response.ok) throw new Error(data.message || "Failed to load profile.");
+      setProfile(data.user);
+      localStorage.setItem("profile", JSON.stringify(data.user));
+    } catch (error) {
+      console.error("Fetch profile error:", error);
+      setProfileError(error.message || "Failed to load profile.");
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [handleLogout]);
+
+  const saveProfile = async (details) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(PROFILE_URL, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(details),
+    });
+    const data = await response.json();
+    if (response.status === 401) {
+      handleLogout();
+      throw new Error(data.message || "Please log in again.");
+    }
+    if (!response.ok) throw new Error(data.message || "Failed to update profile.");
+    setProfile(data.user);
+    localStorage.setItem("profile", JSON.stringify(data.user));
+    return data.user;
+  };
+
+  const deleteProfile = async (password) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(PROFILE_URL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ password }),
+    });
+    const data = await response.json();
+    if (response.status === 401) {
+      if (!token || data.message?.includes("session")) handleLogout();
+      throw new Error(data.message || "Please log in again.");
+    }
+    if (!response.ok) throw new Error(data.message || "Failed to delete profile.");
+    handleLogout();
+  };
+
   // Auto-slide
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -256,6 +348,11 @@ function App() {
     fetchAccounts();
   }, [isLoggedIn, fetchAccounts]);
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    fetchProfile();
+  }, [isLoggedIn, fetchProfile]);
+
   // Loan math
   const activeLoan = loanTypes.find((l) => l.key === loanType);
   const principal = Math.min(Number(amount) || 0, MAX_CREDIT);
@@ -274,26 +371,6 @@ function App() {
       maximumFractionDigits: 2,
     });
   const sliderPercent = ((term - 12) / (96 - 12)) * 100;
-
-  // =====================================================
-  // LOGIN GATE
-  // =====================================================
-  if (!isLoggedIn) {
-    return (
-      <AuthPage
-        isLogin={isLogin}
-        switchMode={switchMode}
-        form={form}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        showPassword={showPassword}
-        setShowPassword={setShowPassword}
-        loading={loading}
-        message={message}
-        success={success}
-      />
-    );
-  }
 
   const accountsPanelProps = {
     accounts,
@@ -320,12 +397,29 @@ function App() {
     maxCredit: MAX_CREDIT,
   };
 
-  // =====================================================
-  // HOMEPAGE (shown after login)
-  // =====================================================
-  return (
+  const authPage = (
+    <AuthPage
+      isLogin={isLogin}
+      switchMode={switchMode}
+      form={form}
+      handleChange={handleChange}
+      handleSubmit={handleSubmit}
+      showPassword={showPassword}
+      setShowPassword={setShowPassword}
+      loading={loading}
+      message={message}
+      success={success}
+    />
+  );
+
+  const dashboardPage = isLoggedIn ? (
     <div className="min-h-screen bg-[#f3f5f8]">
-      <DashboardHeader handleLogout={handleLogout} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      <DashboardHeader
+        handleLogout={handleLogout}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        profile={profile}
+      />
 
       <main className="max-w-[1280px] mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {/* Hero slider */}
@@ -520,6 +614,46 @@ function App() {
 
       <SiteFooter />
     </div>
+  ) : <Navigate to="/login" replace />;
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+      />
+      <Route
+        path="/login"
+        element={isLoggedIn ? <Navigate to="/dashboard" replace /> : authPage}
+      />
+      <Route
+        path="/register"
+        element={isLoggedIn ? <Navigate to="/dashboard" replace /> : authPage}
+      />
+      <Route path="/dashboard" element={dashboardPage} />
+      <Route
+        path="/profile"
+        element={
+          isLoggedIn ? (
+            <ProfilePage
+              profile={profile}
+              profileLoading={profileLoading}
+              profileError={profileError}
+              onReload={fetchProfile}
+              onSave={saveProfile}
+              onDelete={deleteProfile}
+              handleLogout={handleLogout}
+            />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="*"
+        element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+      />
+    </Routes>
   );
 }
 

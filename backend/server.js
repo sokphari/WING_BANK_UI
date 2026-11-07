@@ -12,12 +12,17 @@ const accountRoutes = require("./routes/account");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+if (!process.env.DB_PASSWORD) {
+  throw new Error("DB_PASSWORD is required. Set it in backend/.env.");
+}
+
 // MySQL connection pool
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "wing_user",
-  password: process.env.DB_PASSWORD || "wingbankdemo@2026",
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || "wing_bank_demo",
+  port: Number(process.env.DB_PORT) || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -25,7 +30,7 @@ const pool = mysql.createPool({
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 // Make database pool available to routes
 app.locals.pool = pool;
@@ -33,7 +38,7 @@ app.locals.pool = pool;
 // API routes
 app.use("/api", exchangeRateRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/accounts", require("./routes/account"));
+app.use("/api/accounts", accountRoutes);
 
 // Test endpoint
 app.get("/", (req, res) => {

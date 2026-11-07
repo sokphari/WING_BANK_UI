@@ -4,3 +4,9 @@ personal password 'wingbankdemo@2026';
 
 
 don't delete ok , because i'm not remember it !
+
+npm run db:seed
+
+Demo data is ready.
+Email: demo@wingbank.local
+Password: DemoPass123!
