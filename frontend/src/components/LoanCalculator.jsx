@@ -1,16 +1,16 @@
 import us from "../assets/us.png";
+import { useTranslation } from "react-i18next";
 
 export default function LoanCalculator({loanTypes, loanType, setLoanType, amount, setAmount, term, setTerm, termOptions, activeLoan, monthlyPayment, totalPayment, money, sliderPercent, maxCredit}) {
+  const { t } = useTranslation();
+
   return (
         <section className="mt-12 sm:mt-14">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6">Loan Calculator</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6">{t("Loan Calculator")}</h2>
 
           <div className="bg-white rounded-[20px] p-5 sm:p-9 border border-gray-200">
-            <h2 className="text-2xl sm:text-3xl font-bold">Find the Right Loan in Seconds</h2>
-            <p className="text-base mt-2">
-              Play around with the loan calculator to get a peek at your monthly payments. If the
-              numbers look good, what are you waiting for?
-            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold">{t("Find the Right Loan in Seconds")}</h2>
+            <p className="text-base mt-2">{t("Play around with the loan calculator to get a peek at your monthly payments. If the numbers look good, what are you waiting for?")}</p>
 
             <div className="flex flex-wrap gap-3 sm:gap-4 mt-6">
               {loanTypes.map(({ key, label, icon: Icon }) => (
@@ -24,14 +24,14 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  {label}
+                  {t(label)}
                 </button>
               ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-10">
               <div>
-                <h2 className="mb-3 text-xl font-semibold">Amount USD (or KHR equivalent)</h2>
+                <h2 className="mb-3 text-xl font-semibold">{t("Amount USD (or KHR equivalent)")}</h2>
 
                 <div className="flex h-[50px] items-center rounded-[15px] bg-[#f1f3f8] px-4">
                   <input
@@ -40,7 +40,7 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
                     max={maxCredit}
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter Amount"
+                    placeholder={t("Enter Amount")}
                     className="flex-1 bg-transparent text-xl text-slate-700 outline-none placeholder:text-[#64748b]"
                   />
                   <div className="flex items-center gap-2 text-xl">
@@ -50,26 +50,26 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
                 </div>
 
                 <p className="mt-5 text-[17px] text-[#50627d]">
-                  Max. Credit Limit : ${maxCredit.toLocaleString()}.00
+                  {t("Max. Credit Limit")} : ${maxCredit.toLocaleString()}.00
                 </p>
                 {Number(amount) > maxCredit && (
                   <p className="mt-1 text-sm text-red-600">
-                    Amount exceeds the limit. Calculating with the maximum.
+                    {t("Amount exceeds the limit. Calculating with the maximum.")}
                   </p>
                 )}
 
                 <div className="mt-9">
-                  <h2 className="mb-4 text-xl font-semibold">Duration</h2>
+                  <h2 className="mb-4 text-xl font-semibold">{t("Duration")}</h2>
 
                   <div className="rounded-[15px] bg-[#f1f3f8] p-5">
-                    <p className="mb-12 text-[17px] text-gray-500">Term</p>
+                    <p className="mb-12 text-[17px] text-gray-500">{t("Term")}</p>
 
                     <div className="relative">
                       <div
                         className="absolute -top-[50px] -translate-x-1/2 whitespace-nowrap rounded-md bg-[#91c800] px-5 py-2 text-base text-white"
                         style={{ left: `${sliderPercent}%` }}
                       >
-                        {term} Months
+                        {term} {t("Months")}
                       </div>
 
                       <input
@@ -83,8 +83,8 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
                       />
 
                       <div className="mt-5 flex justify-between text-[17px]">
-                        <span>12 Months</span>
-                        <span>96 Months</span>
+                        <span>12 {t("Months")}</span>
+                        <span>96 {t("Months")}</span>
                       </div>
                     </div>
                   </div>
@@ -98,7 +98,7 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
                           term === m ? "bg-[#91c800] text-white" : "bg-[#f5f8e9] text-[#91c800]"
                         }`}
                       >
-                        {m} Months
+                        {m} {t("Months")}
                       </button>
                     ))}
                   </div>
@@ -107,7 +107,7 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
 
               <div className="flex min-h-[520px] items-center justify-center rounded-2xl border border-[#e8ebf0] bg-white">
                 <div className="w-full text-center">
-                  <h2 className="text-xl font-semibold text-[#5d6f8a]">Estimated Monthly Payment</h2>
+                  <h2 className="text-xl font-semibold text-[#5d6f8a]">{t("Estimated Monthly Payment")}</h2>
 
                   <div className="mt-[120px] text-3xl font-bold text-[#91c800]">
                     {money(monthlyPayment)}
@@ -115,15 +115,15 @@ export default function LoanCalculator({loanTypes, loanType, setLoanType, amount
 
                   <div className="mt-9 grid grid-cols-3">
                     <div>
-                      <p className="text-[17px] font-semibold text-[#5d6f8a]">Interest Rate</p>
+                      <p className="text-[17px] font-semibold text-[#5d6f8a]">{t("Interest Rate")}</p>
                       <p className="mt-3 text-3xl font-semibold">{activeLoan.rate}%</p>
                     </div>
                     <div>
-                      <p className="text-[17px] font-semibold text-[#5d6f8a]">Total Payment</p>
+                      <p className="text-[17px] font-semibold text-[#5d6f8a]">{t("Total Payment")}</p>
                       <p className="mt-3 text-3xl font-semibold">{money(totalPayment)}</p>
                     </div>
                     <div>
-                      <p className="text-[17px] font-semibold text-[#5d6f8a]">Months</p>
+                      <p className="text-[17px] font-semibold text-[#5d6f8a]">{t("Months")}</p>
                       <p className="mt-3 text-3xl font-semibold">{term}</p>
                     </div>
                   </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import AuthPage from "./components/AuthPage.jsx";
 import DashboardHeader from "./components/DashboardHeader.jsx";
@@ -82,6 +83,7 @@ function getStoredProfile() {
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   // ---------- Auth ----------
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -435,15 +437,15 @@ function App() {
           <div className="bg-white rounded-2xl px-4 sm:px-10 py-4 sm:py-0 h-auto sm:h-[70px] flex flex-wrap items-center justify-between gap-4 sm:gap-0">
             <div className="flex items-center gap-3">
               <img src={card1} alt="" className="w-8 h-8" />
-              <span className="text-[15px] text-gray-700">Accounts</span>
+              <span className="text-[15px] text-gray-700">{t("Accounts")}</span>
             </div>
             <div className="flex items-center gap-3">
               <img src={card2} alt="" className="w-[30px] h-[30px]" />
-              <span className="text-[15px] text-gray-700">Cards</span>
+              <span className="text-[15px] text-gray-700">{t("Cards")}</span>
             </div>
             <div className="flex items-center gap-3">
               <img src={card3} alt="" className="w-[50px] h-[50px]" />
-              <span className="text-[15px] text-gray-700">Support</span>
+              <span className="text-[15px] text-gray-700">{t("Support")}</span>
             </div>
           </div>
         </section>
@@ -451,14 +453,14 @@ function App() {
         {/* What do you need today */}
         <section className="mt-10 sm:mt-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
-            What do you need today?
+            {t("What do you need today?")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div className="bg-white rounded-2xl p-7 h-[260px] relative overflow-hidden">
-              <h3 className="text-[19px] font-bold max-w-[190px]">Start with Your Goal</h3>
+              <h3 className="text-[19px] font-bold max-w-[190px]">{t("Start with Your Goal")}</h3>
               <p className="text-sm text-gray-500 mt-3 max-w-[190px]">
-                Choose what you need and we will help you find the right banking solution.
+                {t("Choose what you need and we will help you find the right banking solution.")}
               </p>
               <span className="absolute top-[26px] right-[26px] text-[22px] text-gray-400">›</span>
               <img src={jip} alt="" className="absolute bottom-[10px] right-[15px] w-[140px] h-[120px] object-contain" />
@@ -466,34 +468,34 @@ function App() {
 
             <div className="bg-white rounded-2xl p-7 h-[260px] relative overflow-hidden">
               <h3 className="text-[19px] font-bold leading-[26px]">
-                I Need Money for Something Important
+                {t("I Need Money for Something Important")}
               </h3>
               <p className="text-sm text-gray-500 mt-3 max-w-[190px]">
-                Get financial support and choose a solution that works for you.
+                {t("Get financial support and choose a solution that works for you.")}
               </p>
               <span className="absolute top-[26px] right-[26px] text-[22px] text-gray-400">›</span>
               <img src={jip1} alt="" className="absolute bottom-[10px] right-[15px] w-[140px] h-[120px] object-contain" />
             </div>
 
             <div className="bg-white rounded-2xl p-7 h-[260px] relative overflow-hidden">
-              <h3 className="text-[19px] font-bold">Exchange Rate</h3>
-              <p className="text-sm text-gray-500 mt-3">Check today's exchange rate.</p>
+              <h3 className="text-[19px] font-bold">{t("Exchange Rate")}</h3>
+              <p className="text-sm text-gray-500 mt-3">{t("Check today's exchange rate.")}</p>
               <span className="absolute top-[26px] right-[26px] text-[22px] text-gray-400">›</span>
 
               <div className="absolute bottom-6 left-7 right-7">
                 <div className="grid grid-cols-3 gap-2 text-[13px] border-b pb-[10px] text-center">
-                  <span className="bg-lime-500 px-[10px] py-2 rounded-[10px] text-white">Currency</span>
-                  <span className="bg-red-500 px-[10px] py-2 rounded-[10px] text-white">Buy</span>
-                  <span className="bg-green-500 px-[10px] py-2 rounded-[10px] text-white">Sell</span>
+                  <span className="bg-lime-500 px-[10px] py-2 rounded-[10px] text-white">{t("Currency")}</span>
+                  <span className="bg-red-500 px-[10px] py-2 rounded-[10px] text-white">{t("Buy")}</span>
+                  <span className="bg-green-500 px-[10px] py-2 rounded-[10px] text-white">{t("Sell")}</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-[13px] py-[10px] border-b text-center">
                   <span>USD/KHR</span>
                   <span>
-                    {exchangeRate ? Math.round(exchangeRate.buy).toLocaleString() : "Loading..."}
+                    {exchangeRate ? Math.round(exchangeRate.buy).toLocaleString() : t("Loading...")}
                   </span>
                   <span>
-                    {exchangeRate ? Math.round(exchangeRate.sell).toLocaleString() : "Loading..."}
+                    {exchangeRate ? Math.round(exchangeRate.sell).toLocaleString() : t("Loading...")}
                   </span>
                 </div>
               </div>
@@ -510,8 +512,8 @@ function App() {
               { title: "I Want to Grow My Money", text: "Build financial confidence with secure and flexible saving options.", img: jip5 },
             ].map((c) => (
               <div key={c.title} className="bg-white rounded-3xl p-8 h-[300px] relative overflow-hidden">
-                <h3 className="text-[23px] font-bold text-lime-500 max-w-[330px]">{c.title}</h3>
-                <p className="text-[15px] text-gray-500 mt-[15px] max-w-[300px]">{c.text}</p>
+                <h3 className="text-[23px] font-bold text-lime-500 max-w-[330px]">{t(c.title)}</h3>
+                <p className="text-[15px] text-gray-500 mt-[15px] max-w-[300px]">{t(c.text)}</p>
                 <span className="absolute top-8 right-8 text-2xl text-lime-500">›</span>
                 <img src={c.img} alt="" className="absolute bottom-2 right-5 w-[250px] h-[190px] object-contain" />
               </div>
@@ -521,18 +523,18 @@ function App() {
 
         {/* App */}
         <section id="app" className="mt-12 sm:mt-14">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6">Wing Bank App</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6">{t("Wing Bank App")}</h2>
 
           <div className="bg-[#edf5e7] rounded-[20px] min-h-[400px] p-8 sm:p-14 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="max-w-[520px]">
               <h2 className="text-[28px] sm:text-[42px] font-bold leading-[34px] sm:leading-[50px]">
-                Bank Smarter. Live Easier.
+                {t("Bank Smarter. Live Easier.")}
               </h2>
               <p className="text-base text-gray-600 mt-5 leading-[26px]">
-                Everything you need — saving, loans, transfers, and payments — is in one powerful app.
+                {t("Everything you need — saving, loans, transfers, and payments — is in one powerful app.")}
               </p>
               <button className="mt-7 bg-white px-8 py-4 rounded-[10px] text-[15px] font-semibold">
-                Download Now
+                {t("Download Now")}
               </button>
             </div>
             <img src={jib_app_en} alt="Wing Bank App" className="w-[280px] sm:w-[400px] h-[220px] sm:h-[300px] object-contain" />
@@ -541,7 +543,7 @@ function App() {
 
         {/* Promotions */}
         <section className="mt-12 sm:mt-14">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6">Explore What's New</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6">{t("Explore What's New")}</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
@@ -551,9 +553,9 @@ function App() {
             ].map((p) => (
               <div key={p.title} className="bg-white rounded-2xl p-4">
                 <img src={p.img} alt="" className="w-full h-[260px] sm:h-[420px] object-cover rounded-xl" />
-                <h3 className="text-xl font-semibold mt-4">{p.title}</h3>
+                <h3 className="text-xl font-semibold mt-4">{t(p.title)}</h3>
                 <p className="text-[13px] text-gray-400 mt-2">
-                  Promo Period: <b>Dec 31, 2026</b>
+                  {t("Promo Period:")} <b>Dec 31, 2026</b>
                 </p>
               </div>
             ))}
@@ -561,25 +563,25 @@ function App() {
 
           <div className="flex justify-center mt-7">
             <button className="bg-lime-500 text-white text-sm font-semibold px-7 py-3 rounded-full">
-              View Promotions
+              {t("View Promotions")}
             </button>
           </div>
         </section>
 
         {/* Security */}
         <section className="mt-12 sm:mt-14">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6">Security</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6">{t("Security")}</h2>
 
           <div className="bg-[#edf4fc] rounded-[20px] min-h-[380px] p-8 sm:p-14 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div>
               <h2 className="text-[28px] sm:text-[38px] font-bold max-w-[420px] leading-[34px] sm:leading-[46px]">
-                Your Security. Our Commitment.
+                {t("Your Security. Our Commitment.")}
               </h2>
               <p className="text-base text-gray-600 mt-[18px] max-w-[440px]">
-                Advanced encryption and monitoring keep your banking safe at every step.
+                {t("Advanced encryption and monitoring keep your banking safe at every step.")}
               </p>
               <button className="mt-7 bg-lime-500 text-white text-[15px] font-semibold px-8 py-[14px] rounded-[10px]">
-                Explore More
+                {t("Explore More")}
               </button>
             </div>
             <img src={securebanking} alt="Security" className="w-[280px] sm:w-[400px] h-[220px] sm:h-[290px] object-contain" />
@@ -588,18 +590,18 @@ function App() {
 
         {/* Awards */}
         <section className="mt-12 sm:mt-14">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6">Awards and Trust</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6">{t("Awards and Trust")}</h2>
 
           <div className="relative bg-[#241006] rounded-[20px] min-h-[400px] p-8 sm:p-14 flex flex-col lg:flex-row items-start lg:items-center overflow-hidden gap-8">
             <div className="relative z-10 max-w-[440px]">
               <h2 className="text-white text-[28px] sm:text-[38px] font-bold max-w-[420px]">
-                Recognized for Excellence
+                {t("Recognized for Excellence")}
               </h2>
               <p className="text-white/70 text-base mt-[18px] max-w-[440px]">
-                Award-winning services built on trust, performance, and customer commitment.
+                {t("Award-winning services built on trust, performance, and customer commitment.")}
               </p>
               <button className="mt-7 bg-lime-500 text-white text-[15px] font-semibold px-8 py-[14px] rounded-[10px]">
-                Explore More
+                {t("Explore More")}
               </button>
             </div>
             <img

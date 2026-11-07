@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileMenu({ profile }) {
+  const { t } = useTranslation();
+
   return (
     <Link
       to="/profile"
       className="inline-flex h-12 items-center gap-3 rounded-full bg-gray-100 px-4 text-base font-semibold text-gray-700 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900 active:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500"
-      aria-label="Open profile page"
+      aria-label={t("Open profile page")}
     >
       {profile?.avatar ? (
         <img
@@ -18,7 +21,7 @@ export default function ProfileMenu({ profile }) {
           {(profile?.name || "U").charAt(0).toUpperCase()}
         </span>
       )}
-      <span className="hidden md:inline">{profile?.name || "Profile"}</span>
+      <span className="hidden md:inline">{profile?.name || t("Profile")}</span>
     </Link>
   );
 }

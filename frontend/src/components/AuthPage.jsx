@@ -1,8 +1,12 @@
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 import wingBankLogo from "../assets/wb-logo.svg";
 import loginBackground from "../assets/bgformlogin.png";
+import LanguageSwitcher from "./LanguageSwitcher.jsx";
 
 export default function AuthPage({isLogin, switchMode, form, handleChange, handleSubmit, showPassword, setShowPassword, loading, message, success}) {
+  const { t } = useTranslation();
+
   return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-100 p-4 flex items-center justify-center">
         <div className="w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-blue-900/10 border border-blue-100">
@@ -10,7 +14,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
             {/* Left: branding */}
             <section
               className="relative overflow-hidden bg-cover bg-center p-8 md:p-10"
-              style={{
+                                                                                               style={{
                 backgroundImage: `url(${loginBackground})`,
                 backgroundPosition: "35% center",
               }}
@@ -21,12 +25,15 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                   alt="Wing Bank"
                   className="w-56 sm:w-64 h-auto object-contain object-left"
                 />
-              </div>
+              </div>                                        
 
             </section>
 
             {/* Right: login / register */}
             <section className="p-6 sm:p-10 md:p-12">
+              <div className="mb-3 flex justify-end">
+                <LanguageSwitcher />
+              </div>
               <div className="mb-9 flex justify-center">
                 <img
                   src={wingBankLogo}
@@ -36,12 +43,12 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
               </div>
 
               <h2 className="text-center text-3xl font-bold tracking-tight text-slate-900">
-                {isLogin ? "Login Account" : "Create Account"}
+                {isLogin ? t("Login Account") : t("Create Account")}
               </h2>
               <p className="mt-2 text-center text-sm leading-6 text-slate-500">
                 {isLogin
-                  ? "Welcome back! Please login to your account."
-                  : "Register to start Wing bank."}
+                  ? t("Welcome back! Please login to your account.")
+                  : t("Register to start Wing bank.")}
               </p>
 
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -51,14 +58,14 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                       htmlFor="name"
                       className="mb-2 block text-sm font-semibold text-slate-700"
                     >
-                      Full Name
+                      {t("Full Name")}
                     </label>
                     <input
                       id="name"
                       name="name"
                       type="text"
                       autoComplete="name"
-                      placeholder="Enter your full name"
+                      placeholder={t("Enter your full name")}
                       value={form.name}
                       onChange={handleChange}
                       required
@@ -72,7 +79,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                     htmlFor="email"
                     className="mb-2 block text-sm font-semibold text-slate-700"
                   >
-                    Email Address
+                      {t("Email Address")}
                   </label>
                   <div className="flex items-center rounded-xl border border-slate-200 px-4 focus-within:border-[#85cc16] focus-within:ring-4 focus-within:ring-[#85cc16]/20">
                     <FiMail className="shrink-0 text-slate-400" size={19} />
@@ -81,7 +88,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                       name="email"
                       type="email"
                       autoComplete="email"
-                      placeholder="Enter your email"
+                      placeholder={t("Enter your email")}
                       value={form.email}
                       onChange={handleChange}
                       required
@@ -95,7 +102,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                     htmlFor="password"
                     className="mb-2 block text-sm font-semibold text-slate-700"
                   >
-                    Password
+                      {t("Password")}
                   </label>
                   <div className="flex items-center rounded-xl border border-slate-200 px-4 focus-within:border-[#85cc16] focus-within:ring-4 focus-within:ring-[#85cc16]/20">
                     <FiLock className="shrink-0 text-slate-400" size={19} />
@@ -104,7 +111,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                       name="password"
                       type={showPassword ? "text" : "password"}
                       autoComplete={isLogin ? "current-password" : "new-password"}
-                      placeholder="Enter your password"
+                      placeholder={t("Enter your password")}
                       value={form.password}
                       onChange={handleChange}
                       minLength={6}
@@ -114,20 +121,20 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={showPassword ? t("Hide password") : t("Show password")}
                       className="text-slate-400 hover:text-blue-700"
                     >
                       {showPassword ? <FiEyeOff size={19} /> : <FiEye size={19} />}
                     </button>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-sm">
-                    <p className="text-slate-500">At least 6 characters</p>
+                    <p className="text-slate-500">{t("At least 6 characters")}</p>
                     {isLogin && (
                       <button
                         type="button"
                         className="font-semibold text-blue-700 hover:text-blue-800"
                       >
-                        Forgot password?
+                        {t("Forgot password?")}
                       </button>
                     )}
                   </div>
@@ -138,7 +145,7 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                   disabled={loading}
                   className="flex w-full items-center justify-center rounded-xl bg-[#85cc16] px-4 py-4 font-bold text-white shadow-lg shadow-[#85cc16]/20 transition hover:bg-[#78b914] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
+                  {loading ? t("Please wait...") : isLogin ? t("Login") : t("Create Account")}
                 </button>
               </form>
 
@@ -152,24 +159,24 @@ export default function AuthPage({isLogin, switchMode, form, handleChange, handl
                       : "border-red-200 bg-red-50 text-red-700"
                   }`}
                 >
-                  {message}
+                  {t(message)}
                 </div>
               )}
 
               <div className="my-7 flex items-center gap-4">
                 <div className="h-px flex-1 bg-slate-200" />
-                <span className="text-sm text-slate-400">or</span>
+                <span className="text-sm text-slate-400">{t("or")}</span>
                 <div className="h-px flex-1 bg-slate-200" />
               </div>
 
               <p className="text-center text-sm text-slate-500">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+                {isLogin ? t("Don't have an account?") : t("Already have an account?")}{" "}
                 <button
                   type="button"
                   onClick={() => switchMode(!isLogin)}
                   className="font-bold text-blue-700 hover:text-green-700"
                 >
-                  {isLogin ? "Register here" : "Login here"}
+                  {isLogin ? t("Register here") : t("Login here")}
                 </button>
               </p>
 

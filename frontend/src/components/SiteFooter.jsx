@@ -1,10 +1,13 @@
 import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { useTranslation } from "react-i18next";
 import wing from "../assets/wing.png";
 import sisa_cert from "../assets/sisa_cert.png";
 import awardg from "../assets/award.png";
 
 export default function SiteFooter() {
+  const { t } = useTranslation();
+
   return (
       <footer className="bg-white border-t border-gray-100">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-12 sm:py-16">
@@ -16,10 +19,10 @@ export default function SiteFooter() {
               ["About Wing Bank", ["News", "About Us", "Careers", "Promotions"]],
             ].map(([heading, items]) => (
               <div key={heading}>
-                <h4 className="text-base font-bold mb-5">{heading}</h4>
+                <h4 className="text-base font-bold mb-5">{t(heading)}</h4>
                 <ul className="space-y-[14px] text-[15px] text-gray-500">
                   {items.map((i) => (
-                    <li key={i}>{i}</li>
+                    <li key={i}>{t(i)}</li>
                   ))}
                 </ul>
               </div>
@@ -46,11 +49,11 @@ export default function SiteFooter() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-between gap-[15px] mt-7 text-[13px] text-gray-400">
-            <p>© 2026 Wing Bank (Cambodia) Plc. All rights reserved.</p>
+            <p>© 2026 Wing Bank (Cambodia) Plc. {t("All rights reserved.")}</p>
             <div className="flex flex-wrap gap-[22px]">
-              <span>Terms of Use</span>
-              <span>Privacy Policy</span>
-              <span>End User Terms and Conditions</span>
+              <span>{t("Terms of Use")}</span>
+              <span>{t("Privacy Policy")}</span>
+              <span>{t("End User Terms and Conditions")}</span>
             </div>
           </div>
         </div>
